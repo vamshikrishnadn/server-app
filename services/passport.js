@@ -6,7 +6,6 @@ const keys = require('../config/keys');
 const User = mongooes.model('users');
 
 passport.serializeUser((user, done) => {
-  // this user.id will come from the mongodb database named _id
   done(null, user.id);
 });
 
@@ -24,18 +23,16 @@ passport.use(
       callbackURL: '/auth/google/callback',
       proxy: true,
     },
-    (accessToken, refreshToken, profile, done) => {
-      User.findOne({ googleId: profile.id }).then((existingUser) => {
-        if (existingUser) {
-          // we already have a record with the give profile ID
-          done(null, existingUser);
-        } else {
-          // We don't have a user record with this ID, make a new record.
-          new User({ googleId: profile.id })
-            .save()
-            .then((newUser) => done(null, newUser));
-        }
-      });
+    async (accessToken, refreshToken, profile, done) => {
+      const existingUser = await User.findOne({ googleId: profile.id });
+
+      if (existingUser) {
+        // we already have a record with the give profile ID
+        return done(null, existingUser);
+      }
+      // We don't have a user record with this ID, make a new record.
+      const user = await new User({ googleId: profile.id }).save();
+      done(null, user);
     }
   )
 );
