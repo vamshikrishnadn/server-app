@@ -43,7 +43,7 @@ module.exports = (app) => {
           {
             _id: surveyId,
             recipients: {
-              $elemMatch: { email: email, responded: false },
+              $elemMatch: { email, responded: false },
             },
           },
           {
@@ -82,7 +82,7 @@ module.exports = (app) => {
       to: survey.recipients,
       from: { name: 'VamshiKrishna', email: 'nallappareddy032@gmail.com' },
       subject: survey.subject,
-      text: 'survey.body',
+      text: survey.body,
       html: surveyTemplate(survey),
     };
     try {
